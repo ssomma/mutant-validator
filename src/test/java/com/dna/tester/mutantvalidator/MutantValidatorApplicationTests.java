@@ -1,0 +1,13 @@
+package com.dna.tester.mutantvalidator;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class MutantValidatorApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}

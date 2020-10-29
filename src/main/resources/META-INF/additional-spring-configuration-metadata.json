@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "gene.types",
+      "type": "java.lang.String",
+      "description": "Description for gene.types."
+    },
+    {
+      "name": "mutant.pattern.length",
+      "type": "java.lang.String",
+      "description": "Description for mutant.pattern.length."
+    }
+  ] }
