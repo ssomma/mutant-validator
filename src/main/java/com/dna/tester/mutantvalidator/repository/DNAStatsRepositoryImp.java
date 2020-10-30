@@ -1,13 +1,13 @@
-package com.dna.tester.mutantvalidator.repository;
+/*package com.dna.tester.mutantvalidator.repository;
 
 import com.dna.tester.mutantvalidator.model.DNAStat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-
+import java.io.Serializable;
 import java.util.Map;
 
-public class DNAStatsRepositoryImp implements DNAStatsRepository{
+public class DNAStatsRepositoryImp implements Serializable {
 
 
     private RedisTemplate<String, DNAStat> redisTemplate;
@@ -44,3 +44,4 @@ public class DNAStatsRepositoryImp implements DNAStatsRepository{
         hashOperations.delete("USER", id);
     }
 }
+*/

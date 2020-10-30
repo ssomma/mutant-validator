@@ -85,20 +85,19 @@ public class MutantServiceImp implements MutantService {
                     .withMutantResultText(resultText)
                     .build();
 
-            Long dnaStatValue = dnaStatsRepository.findById(resultText).getValue();
-
-            DNAStat dnaStatEntity =  DNAStat.builder()
-                    .withKey(resultText)
-                    .withValue(dnaStatValue + 1)
-                    .build();
-
-            try{
-                dnaRepository.save(dnaEntity);
-                dnaStatsRepository.save(dnaStatEntity);
+            DNAStat dnaStatEntity;
+            if(dnaStatsRepository.existsById(resultText)){
+                dnaStatEntity = dnaStatsRepository.findById(resultText).get();
             }
-            catch(Exception ex){
-                 throw new RuntimeException(ex);
+            else{
+                dnaStatEntity = new DNAStat(resultText, 0L);
             }
+
+            dnaStatEntity.setValue(dnaStatEntity.getValue() + 1);
+
+           dnaRepository.save(dnaEntity);
+           dnaStatsRepository.save(dnaStatEntity);
+
     }
 
 
