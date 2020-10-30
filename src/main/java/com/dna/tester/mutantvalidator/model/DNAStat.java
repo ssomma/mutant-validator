@@ -1,17 +1,25 @@
 package com.dna.tester.mutantvalidator.model;
 
+import org.springframework.data.redis.core.RedisHash;
+
 import java.io.Serializable;
 
+@RedisHash("DNAStat")
 public class DNAStat implements Serializable {
-    private String key;
+    private String id;
     private Long value;
 
-    public String getKey() {
-        return key;
+    public DNAStat(String id, Long value){
+        this.id = id;
+        this.value = value;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Long getValue() {
@@ -20,37 +28,5 @@ public class DNAStat implements Serializable {
 
     public void setValue(Long value) {
         this.value = value;
-    }
-
-    public static DNAStatBuilder builder(){return new DNAStatBuilder();}
-
-    public static final class DNAStatBuilder {
-        private String key;
-        private Long value;
-
-        private DNAStatBuilder() {
-        }
-
-        public static DNAStatBuilder aDNAStat() {
-            return new DNAStatBuilder();
-        }
-
-
-        public DNAStatBuilder withKey(String key) {
-            this.key = key;
-            return this;
-        }
-
-        public DNAStatBuilder withValue(Long value) {
-            this.value = value;
-            return this;
-        }
-
-        public DNAStat build() {
-            DNAStat dNAStat = new DNAStat();
-            dNAStat.setKey(key);
-            dNAStat.setValue(value);
-            return new DNAStat();
-        }
     }
 }
