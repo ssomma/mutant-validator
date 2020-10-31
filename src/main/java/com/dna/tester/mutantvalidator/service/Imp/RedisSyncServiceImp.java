@@ -4,6 +4,8 @@ import com.dna.tester.mutantvalidator.model.DNA;
 import com.dna.tester.mutantvalidator.model.DNAStat;
 import com.dna.tester.mutantvalidator.repository.DNARepository;
 import com.dna.tester.mutantvalidator.service.RedisSyncService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationPreparedEvent;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -17,9 +19,11 @@ import javax.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.util.List;
 
+
 @Service
 public class RedisSyncServiceImp implements RedisSyncService {
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
     private static final String CACHE_NAME = "DNASTATS";
     private DNARepository dnaRepository;
     private RedisTemplate<String, BigInteger> redisTemplate;
@@ -27,22 +31,26 @@ public class RedisSyncServiceImp implements RedisSyncService {
 
     @Autowired
     RedisSyncServiceImp(RedisTemplate<String,BigInteger> redisTemplate, DNARepository dnaRepository) {
+        log.info("Initializing RedisSyncService.");
         this.redisTemplate = redisTemplate;
         this.dnaRepository = dnaRepository;
     }
 
     @PostConstruct
     public void initializeHashOperations(){
+        log.debug("Getting hash operations.");
         hashOperations = redisTemplate.opsForHash();
     }
 
-    @EventListener(ApplicationStartedEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
     private void syncRedisToDatabase(){
+        log.info("Syncing redis with database");
         List<String> mutantResults = dnaRepository.distinctMutantResult();
         for(String result : mutantResults){
             Long valueResult = dnaRepository.countByMutantResultText(result);
             DNAStat dnaStat = new DNAStat(result,valueResult);
             save(dnaStat);
+            log.info(String.format("Synced the stat %s with value %d", result, valueResult));
         }
     }
 

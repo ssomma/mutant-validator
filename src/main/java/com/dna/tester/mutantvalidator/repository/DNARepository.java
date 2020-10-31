@@ -13,7 +13,7 @@ public interface DNARepository extends JpaRepository<DNA, Long> {
 
     List<DNA> findDNAById(Long id);
 
-    @Query(value = "SELECT DISTINCT mutant_result_text FROM DNADB.DNACatalog", nativeQuery = true)
+    @Query(value = "SELECT DISTINCT mutant_result_text FROM dnadb.dnacatalog", nativeQuery = true)
     List<String> distinctMutantResult();
 
     Long countByMutantResultText(String mutantResultText);
