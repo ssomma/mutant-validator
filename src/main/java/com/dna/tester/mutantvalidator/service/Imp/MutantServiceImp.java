@@ -2,12 +2,13 @@ package com.dna.tester.mutantvalidator.service.Imp;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import com.dna.tester.mutantvalidator.configuration.AppConfiguration;
+import com.dna.tester.mutantvalidator.exception.DBSyncException;
 import com.dna.tester.mutantvalidator.model.DNA;
 import com.dna.tester.mutantvalidator.model.DNACandidateDTO;
-import com.dna.tester.mutantvalidator.model.DNAStat;
 import com.dna.tester.mutantvalidator.repository.DNARepository;
-import com.dna.tester.mutantvalidator.repository.DNAStatsRepository;
 import com.dna.tester.mutantvalidator.service.MutantService;
+import com.dna.tester.mutantvalidator.service.RedisSyncService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,25 +20,22 @@ import static com.dna.tester.mutantvalidator.utils.DNAMutantValidator.*;
 @Service
 public class MutantServiceImp implements MutantService {
 
-
     private final Logger log = Logger.getLogger(this.getClass().getName());
     private DNARepository dnaRepository;
-    private DNAStatsRepository dnaStatsRepository;
-
-
-    private static final String GENE_TYPES = "ACTG";
-    private static final int PATTERN_LENGTH = 4;
+    private RedisSyncService redisSyncService;
+    private String GENE_TYPES;
+    private int PATTERN_LENGTH;
 
     @Autowired
-    public MutantServiceImp(DNARepository dnaRepository, DNAStatsRepository dnaStatsRepository) {
+    public MutantServiceImp(AppConfiguration appConfiguration, DNARepository dnaRepository, RedisSyncService redisSyncService) {
         this.dnaRepository = dnaRepository;
-        this.dnaStatsRepository = dnaStatsRepository;
+        this.GENE_TYPES = appConfiguration.getGeneTypes();
+        this.PATTERN_LENGTH = appConfiguration.getMutantPatternLength();
+        this.redisSyncService = redisSyncService;
     }
 
-    // process mutant es el que va al controlador, llama a isMutant
-
     @Override
-    public ResponseEntity ProcessMutantValidator(DNACandidateDTO dnaCandidateDTO){
+    public ResponseEntity ProcessMutantValidator(DNACandidateDTO dnaCandidateDTO) throws DBSyncException {
 
         String[] dnaCandidate = dnaCandidateDTO.getDna();
         ResponseEntity<String> mutantResult;
@@ -45,11 +43,12 @@ public class MutantServiceImp implements MutantService {
 
         if(isMutant) mutantResult = new ResponseEntity("Mutant", HttpStatus.OK);
         else mutantResult = new ResponseEntity("Human", HttpStatus.FORBIDDEN);
+
         saveDNAEntity(dnaCandidate,mutantResult.getStatusCodeValue(),mutantResult.getBody());
 
+
+
         return mutantResult;
-
-
     }
 
 
@@ -76,8 +75,7 @@ public class MutantServiceImp implements MutantService {
     }
 
     // Métodos de persistencia
-
-    private void saveDNAEntity(String[] dna, int resultCode, String resultText){
+    private void saveDNAEntity(String[] dna, int resultCode, String resultText) throws DBSyncException {
 
             DNA dnaEntity = DNA.builder()
                     .withDnaReceived(Arrays.toString(dna))
@@ -85,19 +83,14 @@ public class MutantServiceImp implements MutantService {
                     .withMutantResultText(resultText)
                     .build();
 
-            DNAStat dnaStatEntity;
-            if(dnaStatsRepository.existsById(resultText)){
-                dnaStatEntity = dnaStatsRepository.findById(resultText).get();
-            }
-            else{
-                dnaStatEntity = new DNAStat(resultText, 0L);
+            try{
+                dnaRepository.save(dnaEntity);
+                redisSyncService.incrStat(resultText);
             }
 
-            dnaStatEntity.setValue(dnaStatEntity.getValue() + 1);
-
-           dnaRepository.save(dnaEntity);
-           dnaStatsRepository.save(dnaStatEntity);
-
+            catch (Exception ex){
+                throw new DBSyncException("Error at syncing with Database.");
+            }
     }
 
 

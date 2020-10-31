@@ -7,16 +7,16 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfiguration {
 
     @Value("${gene.types}")
-    private static String geneTypes;
+    private String geneTypes;
 
     @Value("${mutant.pattern.length}")
-    private static int mutantPatternLength;
+    private int mutantPatternLength;
 
-    public static String getGeneTypes() {
+    public String getGeneTypes() {
         return geneTypes;
     }
 
-    public static int getMutantPatternLength() {
+    public int getMutantPatternLength() {
         return mutantPatternLength;
     }
 }

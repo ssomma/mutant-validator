@@ -1,8 +1,9 @@
 package com.dna.tester.mutantvalidator.service;
 
+import com.dna.tester.mutantvalidator.exception.DBSyncException;
 import com.dna.tester.mutantvalidator.model.DNACandidateDTO;
 import org.springframework.http.ResponseEntity;
 
 public interface MutantService {
-    ResponseEntity ProcessMutantValidator(DNACandidateDTO dnaCandidateDTO);
+    ResponseEntity ProcessMutantValidator(DNACandidateDTO dnaCandidateDTO) throws DBSyncException;
 }
