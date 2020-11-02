@@ -1,8 +1,8 @@
 # API Validadora de mutantes
 
-* Se definen las configuraciones de uso dentro del archivo application.config.
+* Se definen las configuraciones de uso dentro del archivo application.properties.
 * Se ejecuta la aplicación inicializando el MutanValidatorApplication.java.
-* Se valida el funcionamiento en Motor MySQL. Se define como base principal "DNADB".
+* Se valida el funcionamiento en Motor MySQL. Se define como base principal "dnadb".
 
 ## Endpoints
 
@@ -11,7 +11,7 @@
 
 | POST                     | Description                       |
 |:----------------------------|:----------------------------------|
-| `/mutant/`      | Devuelve el resultado de la verificacion del ADN recibido |
+| `/mutant/`      | Devuelve el resultado de la verificación del ADN recibido |
 
 
 ###### Request Body
@@ -35,35 +35,28 @@
 
 
 ###### Response body
-    {
-        "count_mutant_dna": "17",
-        "count_human_dna": "6",
-        "ratio" : "0.352941"
-    }
+    {"count_mutant_dna": "17","count_human_dna": "6","ratio" : "0.352941"}
     
 ###### Responses
 
 * 200 - OK
 
-
-### Consideraciones
+## Consideraciones
 
 *  Se utiliza una conexión Redis para el manejo de datos estadísticos externo a la base de datos con el fin de evitar la saturación de consultas manteniendo la posibilidad de utilizar el servicio en multiples instancias.
     
 *  Se realiza al inicio del servicio una primera sincronización de datos desde base a hacia redis y posteriormente se actualiza la información en relación con cada nuevo registro insertado.
     
-*  Se 
-
 ## Puntos a mejorar
 
-1. Debido a inconvenientes el framework de relacion a base de datos, los datos para la sincronizacion inicial con redis (Resultado/Cantidad) 
-    se consiguen mediante dos consultas separadas. Esto debe ser unificado a una sola consulta que arme el objeto para la sincronizacion.
+1. Debido a inconvenientes el framework de relación a base de datos, los datos para la sincronización inicial con redis (Resultado/Cantidad) 
+    se consiguen mediante dos consultas separadas. Esto debe ser unificado a una sola consulta que arme el objeto para la sincronización.
     
-2. A fin de mejorar la consistencia estadisitica, se debe crear un proceso de sincronizacion periodica 
+2. A fin de mejorar la consistencia estadística, se debe crear un proceso de sincronización periódica 
     que evite desfases en tiempos prolongados o la necesidad de reiniciar una instancia de la API.
     
 3. Se debe agregar una trazabilidad persistente sea en archivo o base de datos sobre el comportamiento de la API.
 
-4. Se puede agregar la insercion de registros erroneos, hoy no contemplados en base de datos, con fin de establecer metricas que permitan monitorear la devolucion de resultados validos en todo momento.
+4. Se puede agregar la inserción de registros erróneos, hoy no contemplados en base de datos, con fin de establecer métricas que permitan monitorear la devolución de resultados validos en todo momento.
 
-5. Por motivos de tiempo e inconvenientes en la creacion de una instancia redis para testeo, deben ser agregadas las pruebas unitarias respectivas al servicio RedisSyncService.
+5. Por motivos de tiempo e inconvenientes en la creación de una instancia redis para testeo, deben ser agregadas las pruebas unitarias respectivas al servicio RedisSyncService.
