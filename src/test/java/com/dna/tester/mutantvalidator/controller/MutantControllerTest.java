@@ -12,10 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static reactor.core.publisher.Mono.when;
 
 public class MutantControllerTest {
 
@@ -33,7 +30,7 @@ public class MutantControllerTest {
     @Test
     public void testInvalidDNACandidateDTO() {
         DNACandidateDTO invalidCandidate = null;
-        Assert.assertThrows(RuntimeException.class,() -> { mutantController.checkMutant(invalidCandidate);});
+        Assert.assertThrows(InvalidDNASampleException.class,() -> { mutantController.checkMutant(invalidCandidate);});
     }
 
 

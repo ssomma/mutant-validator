@@ -4,19 +4,15 @@ import com.dna.tester.mutantvalidator.exception.InvalidDNASampleException;
 import com.dna.tester.mutantvalidator.model.DNA;
 import com.dna.tester.mutantvalidator.model.DNACandidateDTO;
 import com.dna.tester.mutantvalidator.repository.DNARepository;
-import com.dna.tester.mutantvalidator.service.MutantService;
 import com.dna.tester.mutantvalidator.service.RedisSyncService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
 

@@ -1,6 +1,7 @@
 package com.dna.tester.mutantvalidator.controller;
 
 import com.dna.tester.mutantvalidator.exception.DBSyncException;
+import com.dna.tester.mutantvalidator.exception.InvalidDNASampleException;
 import com.dna.tester.mutantvalidator.model.DNACandidateDTO;
 import com.dna.tester.mutantvalidator.service.MutantService;
 import org.slf4j.Logger;
@@ -24,7 +25,14 @@ public class MutantController {
     @PostMapping("/mutant")
     ResponseEntity checkMutant(@RequestBody DNACandidateDTO DNACandidate) throws DBSyncException {
         log.info("Initializing MutantController method.");
-        if(DNACandidate.getDna() == null) throw new RuntimeException();
+        if(DNACandidate.getDna() == null) throw new InvalidDNASampleException("Invalid body at method /mutant. method body should be like {\n" +
+                "    \"dna\": [\n" +
+                "        \"AAAA\",\n" +
+                "        \"CCCC\",\n" +
+                "        \"TTTT\",\n" +
+                "        \"GGGG\",\n" +
+                "    ]\n" +
+                "}");
         return mutantService.ProcessMutantValidator(DNACandidate);
     }
 
