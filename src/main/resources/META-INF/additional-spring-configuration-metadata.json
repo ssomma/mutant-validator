@@ -9,5 +9,16 @@
       "name": "mutant.pattern.length",
       "type": "java.lang.String",
       "description": "Description for mutant.pattern.length."
+    },
+    {
+      "name": "redis.hostname",
+      "type": "java.lang.String",
+      "description": "Description for redis.hostname."
+    },
+
+    {
+      "name": "redis.port",
+      "type": "java.lang.Integer",
+      "description": "Description for redis.port."
     }
   ] }

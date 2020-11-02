@@ -29,7 +29,7 @@ public class StatisticsServiceImp implements StatisticsService {
         DNAStat humanStat = redisSyncService.find("Human");
         Float mutantToHumanRatio = mutantStat.getResult() / humanStat.getResult().floatValue();
 
-        String statsResponse = String.format("{\"count_mutant_dna\": \"%d\", \"count_human_dna\": \"%d\", \"ratio\" : \"%f\"}", humanStat.getResult(), mutantStat.getResult(), mutantToHumanRatio);
+        String statsResponse = String.format("{\"count_mutant_dna\": \"%d\", \"count_human_dna\": \"%d\", \"ratio\" : \"%f\"}", mutantStat.getResult(), humanStat.getResult(), mutantToHumanRatio);
         log.debug("Request result: " + statsResponse);
 
         return new ResponseEntity<>(statsResponse,HttpStatus.OK);

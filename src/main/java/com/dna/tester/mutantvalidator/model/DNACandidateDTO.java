@@ -1,5 +1,6 @@
 package com.dna.tester.mutantvalidator.model;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class DNACandidateDTO {
@@ -16,14 +17,16 @@ public class DNACandidateDTO {
         this.dna = dna;
     }
 
-
+    public static DNACandidateDTOBuilder builder(){
+        return new DNACandidateDTOBuilder();
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DNACandidateDTO that = (DNACandidateDTO) o;
-        return Objects.equals(dna, that.dna);
+        return Arrays.equals(dna, that.dna);
     }
 
     @Override
@@ -34,7 +37,29 @@ public class DNACandidateDTO {
     @Override
     public String toString() {
         return "DNACandidateDTO{" +
-                "dna=" + dna +
+                "dna=" + Arrays.toString(dna) +
                 '}';
+    }
+
+    public static final class DNACandidateDTOBuilder {
+        private String[] dna;
+
+        private DNACandidateDTOBuilder() {
+        }
+
+        public static DNACandidateDTOBuilder aDNACandidateDTO() {
+            return new DNACandidateDTOBuilder();
+        }
+
+        public DNACandidateDTOBuilder withDna(String[] dna) {
+            this.dna = dna;
+            return this;
+        }
+
+        public DNACandidateDTO build() {
+            DNACandidateDTO dNACandidateDTO = new DNACandidateDTO();
+            dNACandidateDTO.setDna(dna);
+            return dNACandidateDTO;
+        }
     }
 }

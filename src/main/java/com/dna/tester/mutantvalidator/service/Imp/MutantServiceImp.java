@@ -1,7 +1,8 @@
 package com.dna.tester.mutantvalidator.service.Imp;
 import java.util.Arrays;
 
-import com.dna.tester.mutantvalidator.configuration.AppConfiguration;
+import com.dna.tester.mutantvalidator.exception.InvalidDNASampleException;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,29 +16,29 @@ import com.dna.tester.mutantvalidator.service.RedisSyncService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
-import static com.dna.tester.mutantvalidator.utils.DNAMutantValidator.*;
 
-
+@SuppressWarnings({"ALL", "unchecked"})
 @Service
 public class MutantServiceImp implements MutantService {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
     private DNARepository dnaRepository;
     private RedisSyncService redisSyncService;
-    private String GENE_TYPES;
-    private int PATTERN_LENGTH;
+
+    private final String GENE_TYPES = "ACTG";
+
+    private final int PATTERN_LENGTH = 4;
 
     @Autowired
-    public MutantServiceImp(AppConfiguration appConfiguration, DNARepository dnaRepository, RedisSyncService redisSyncService) {
+    public MutantServiceImp(DNARepository dnaRepository, RedisSyncService redisSyncService) {
         log.info("Initializing MutantService.");
         this.dnaRepository = dnaRepository;
-        this.GENE_TYPES = appConfiguration.getGeneTypes();
-        this.PATTERN_LENGTH = appConfiguration.getMutantPatternLength();
         this.redisSyncService = redisSyncService;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public ResponseEntity ProcessMutantValidator(DNACandidateDTO dnaCandidateDTO) throws DBSyncException {
+    public ResponseEntity<?> ProcessMutantValidator(@NotNull DNACandidateDTO dnaCandidateDTO){
         log.info("Start validation of mutant DNA");
         String[] dnaCandidate = dnaCandidateDTO.getDna();
         ResponseEntity<String> mutantResult;
@@ -65,7 +66,7 @@ public class MutantServiceImp implements MutantService {
             int colPosition = 0;
             while (colPosition < colSize) {
                 for (Character gene : GENE_TYPES.toCharArray()) {
-                    mutantCandidate = validateAdjacentGene(dna, gene, PATTERN_LENGTH, GENE_TYPES, rowSize, colSize, rowPosition, colPosition);
+                    mutantCandidate = validateAdjacentGene(dna, gene, rowSize, colSize, rowPosition, colPosition);
                     if (mutantCandidate) {
                         return true;
                     }
@@ -76,8 +77,58 @@ public class MutantServiceImp implements MutantService {
         return false;
     }
 
+    private boolean validateAdjacentGene(String[] dna, Character gene, int rowSize, int columnSize, int initialRow, int initialCol){
+
+        int[] rowDirections = {0,0,1,1,1,-1,-1,-1};
+        int[] colDirections = {1,-1,1,0,-1,1,0,-1};
+        char geneValue = dna[initialRow].charAt(initialCol);
+        validGeneChecker(geneValue);
+        if(geneValue != gene) return false;
+
+        for(int dirCandidate = 0; dirCandidate < 8; dirCandidate++){
+
+            int cellCandidateRow = initialRow + rowDirections[dirCandidate];
+            int cellCandidateCol = initialCol + colDirections[dirCandidate];
+            int patternIndex;
+            for(patternIndex = 1 ; patternIndex < PATTERN_LENGTH; patternIndex++){
+
+                if(cellCandidateRow >= rowSize || cellCandidateCol >= columnSize || cellCandidateRow < 0 || cellCandidateCol < 0) break;
+                geneValue = dna[cellCandidateRow].charAt(cellCandidateCol);
+                validGeneChecker(geneValue);
+                if(geneValue != gene) break;
+
+                cellCandidateRow += rowDirections[dirCandidate];
+                cellCandidateCol += colDirections[dirCandidate];
+
+            }
+            if(patternIndex == PATTERN_LENGTH) return true;
+        }
+        return false;
+    }
+
+
+    // Validadores de datos
+    private void validDNAChecker(String[] dna){
+        int rowSize = dna.length;
+        int colSize;
+
+        for(int row = 0; row < rowSize; row++){
+            colSize = dna[row].length();
+            if(rowSize != colSize)
+                throw new InvalidDNASampleException(String.format("Invalid Row at %d. DNA Sample should be square.", row));
+        }
+
+    }
+
+    private void validGeneChecker(Character gene){
+        if(!GENE_TYPES.contains(gene.toString())) {
+            throw  new InvalidDNASampleException(String.format("Invalid gene. The gene sample %s is not contained on types %s", gene, GENE_TYPES));
+        }
+    }
+
+
     // Métodos de persistencia
-    private void saveDNAEntity(String[] dna, int resultCode, String resultText) throws DBSyncException {
+    private void saveDNAEntity(String[] dna, int resultCode, String resultText){
 
             DNA dnaEntity = DNA.builder()
                     .withDnaReceived(Arrays.toString(dna))

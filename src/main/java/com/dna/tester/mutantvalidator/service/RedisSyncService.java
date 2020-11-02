@@ -10,4 +10,5 @@ public interface RedisSyncService {
    DNAStat find(String id);
    void save(DNAStat dnaStat);
    void incrStat(String id);
+   void syncRedisToDatabase();
 }

@@ -4,6 +4,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "DNACatalog" )
@@ -72,6 +73,30 @@ public class DNA {
         return new DNABuilder();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DNA that = (DNA) o;
+        return mutantResultCode == that.mutantResultCode &&
+                dnaReceived.equals(that.dnaReceived) &&
+                mutantResultText.equals(that.mutantResultText);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dnaReceived, mutantResultCode, mutantResultText);
+    }
+
+    @Override
+    public String toString() {
+        return "DNA{" +
+                "dnaReceived='" + dnaReceived + '\'' +
+                ", mutantResultCode=" + mutantResultCode +
+                ", mutantResultText='" + mutantResultText + '\'' +
+                '}';
+    }
+
     public static final class DNABuilder {
         private Long id;
         private Date requestDate;
@@ -119,5 +144,9 @@ public class DNA {
             dNA.setMutantResultText(mutantResultText);
             return dNA;
         }
+
+
     }
+
+
 }
